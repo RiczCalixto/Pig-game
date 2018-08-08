@@ -22,49 +22,57 @@ none esconde o elemento
 !== does not perform type conversion (===)
 != performs type  covnersion (semelhante  ao ==)
 togle muda  a classe (remove se estiver ligada e ativa se estiver desligada)
+state variables sao variaveis q ficam estaveis com valor de true or false. Nesse caso foi usada para detectar se o jogo ainda estava sendo jogado ou não. Se estiver sendo jogado (true), vai executar o jogo normalmente (roll dice, hold). Caso contrario não funciona e os jogadores serão obrigados a apertar new game)
 */
 
-var scores, roundScore, activePlayer, dice;
+init();
 
-scores=[0,0];
-roundScore=0;
-activePlayer=0;
-
-document.querySelector('.dice').style.display='none';
-
-document.getElementById('score-0').textContent = '0';
-document.getElementById('score-1').textContent = '0';
-document.getElementById('current-0').textContent = '0';
-document.getElementById('current-1').textContent = '0';
+var scores, roundScore, activePlayer, dice, gamePlaying;
 
 document.querySelector('.btn-roll').addEventListener('click', function(){
-	//1. random number
-	dice = Math.floor(Math.random() * 6) +1;
-	//2. Display  de result
-	var diceDOM = document.querySelector('.dice');
-	diceDOM.style.display='block';
-	diceDOM.src = 'dice-'+dice+'.png'
+	if(gamePlaying){
+		//1. random number
+		dice = Math.floor(Math.random() * 6) +1;
+		//2. Display  de result
+		var diceDOM = document.querySelector('.dice');
+		diceDOM.style.display='block';
+		diceDOM.src = 'dice-'+dice+'.png'
 
-	//3.Update the round score IF the rolled number was NOT a 1
+		//3.Update the round score IF the rolled number was NOT a 1
 
-	if(dice !==1){
+		if(dice !==1){
 		roundScore  +=  dice;
 		document.querySelector('#current-'+  activePlayer).textContent=roundScore;
-	} else  {
+		} else  {
 		
 		nextPlayer();
 
 	}
-});  
+	}
+	
+});
 
 document.querySelector('.btn-hold').addEventListener('click', function(){
+	if(gamePlaying){
 	//Add current score to Global score
-	scores[activePlayer] += roundScore;
+		scores[activePlayer] += roundScore;
 	//update user the  interface (UI)
-	document.querySelector('#score-'+ activePlayer).textContent = scores[activePlayer];
+		document.querySelector('#score-'+ activePlayer).textContent = scores[activePlayer];
 	//check if player won the  game
-	nextPlayer();
+		if (scores[activePlayer] >= 10){
+			document.querySelector('#name-'+activePlayer).textContent='Winner';
+			gamePlaying = false;
+	//document.querySelector('.dice').style.display='none';
+			document.querySelector('.player-'+activePlayer+'-panel').classList.add('winner');
+			document.querySelector('.player-'+activePlayer+'-panel').classList.remove('active');
+		} else {
+	//Next player	
+		nextPlayer();
+		}
+	}		
 });
+
+document.querySelector('.btn-new').addEventListener('click', init); //colocar a function init nesse eventListener faz com que, ao clicar, ele use a init. nao preicsa colocar init(), basta init para chamar a function q ja existe
 
 function nextPlayer(){
 		activePlayer === 0 ? activePlayer =  1 : activePlayer = 0/*if activePlayer equals to 0 then activePlayer change to 1 else activePlayer change to  0 isso se chama ternary operator*/
@@ -76,9 +84,32 @@ function nextPlayer(){
 		document.querySelector('.player-0-panel').classList.toggle('active');
 		document.querySelector('.player-1-panel').classList.toggle('active');
 		document.querySelector('.dice').style.display='none';
-}
+};
+
+function init (){
+	scores=[0,0];
+	roundScore=0;
+	activePlayer=0;
+	gamePlaying = true;
+	document.querySelector('.dice').style.display='none';
+	document.getElementById('score-0').textContent = '0';
+	document.getElementById('score-1').textContent = '0';
+	document.getElementById('current-0').textContent = '0';
+	document.getElementById('current-1').textContent = '0';
+	document.querySelector('#name-0').textContent='Player 1';
+	document.querySelector('#name-1').textContent='Player 2';
+	document.querySelector('.player-0-panel').classList.remove('winner');
+	document.querySelector('.player-1-panel').classList.remove('winner');
+	document.querySelector('.player-0-panel').classList.remove('active');
+	document.querySelector('.player-1-panel').classList.remove('active');
+	document.querySelector('.player-0-panel').classList.add('active');
+	
+};
+
+
 /*document.querySelector('#current-'+activePlayer).innerHTML= <em> + dice + <'/em'>;
 */
 //var x = document.querySelector('#score-0').textContent;
 //console.log(x);
+
 
